@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import HealthNode from "./HealthNode";
 import FlowConnections from "./FlowConnections";
@@ -13,7 +14,26 @@ const nodes = [
   "Health Timeline",
 ];
 
-const HealthFlowDiagram = () => {
+interface HealthFlowDiagramProps {
+  isProcessing?: boolean;
+}
+
+const HealthFlowDiagram = ({ isProcessing = false }: HealthFlowDiagramProps) => {
+  const [activeNodeIndex, setActiveNodeIndex] = useState(-1);
+
+  useEffect(() => {
+    if (!isProcessing) {
+      setActiveNodeIndex(-1);
+      return;
+    }
+    let idx = 0;
+    setActiveNodeIndex(0);
+    const interval = setInterval(() => {
+      idx = (idx + 1) % nodes.length;
+      setActiveNodeIndex(idx);
+    }, 900);
+    return () => clearInterval(interval);
+  }, [isProcessing]);
   // Split into 2 rows on mobile, single row on desktop
   const topRow = nodes.slice(0, 4);
   const bottomRow = nodes.slice(4);
@@ -35,7 +55,7 @@ const HealthFlowDiagram = () => {
           <FlowConnections nodeCount={nodes.length} />
           <div className="flex justify-between items-center gap-2 relative z-10">
             {nodes.map((node, i) => (
-              <HealthNode key={node} label={node} index={i} />
+              <HealthNode key={node} label={node} index={i} isActive={activeNodeIndex === i} />
             ))}
           </div>
         </div>
@@ -47,7 +67,7 @@ const HealthFlowDiagram = () => {
           <FlowConnections nodeCount={topRow.length} />
           <div className="flex justify-between items-center gap-2 relative z-10">
             {topRow.map((node, i) => (
-              <HealthNode key={node} label={node} index={i} />
+              <HealthNode key={node} label={node} index={i} isActive={activeNodeIndex === i} />
             ))}
           </div>
         </div>
@@ -64,7 +84,7 @@ const HealthFlowDiagram = () => {
           <FlowConnections nodeCount={bottomRow.length} />
           <div className="flex justify-between items-center gap-2 relative z-10">
             {bottomRow.map((node, i) => (
-              <HealthNode key={node} label={node} index={i + 4} />
+              <HealthNode key={node} label={node} index={i + 4} isActive={activeNodeIndex === i + 4} />
             ))}
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import NeuralBackground from "@/components/health/NeuralBackground";
 import FileUploadZone from "@/components/health/FileUploadZone";
@@ -8,6 +9,11 @@ import GuidanceFeed from "@/components/health/GuidanceFeed";
 import { Brain } from "lucide-react";
 
 const Index = () => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleProcessingChange = useCallback((hasActive: boolean) => {
+    setIsProcessing(hasActive);
+  }, []);
   return (
     <div className="min-h-screen relative neural-gradient">
       <NeuralBackground />
@@ -35,12 +41,12 @@ const Index = () => {
 
         {/* File Upload */}
         <div className="mb-6">
-          <FileUploadZone />
+          <FileUploadZone onProcessingChange={handleProcessingChange} />
         </div>
 
         {/* Flow Diagram */}
         <div className="mb-6">
-          <HealthFlowDiagram />
+          <HealthFlowDiagram isProcessing={isProcessing} />
         </div>
 
         {/* Bottom panels */}
