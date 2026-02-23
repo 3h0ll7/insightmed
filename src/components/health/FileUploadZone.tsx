@@ -1,12 +1,22 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, FlaskConical, ScanLine, X, CheckCircle2 } from "lucide-react";
+
+type ProcessingStage = "uploading" | "extracting" | "analyzing" | "complete";
+
+const stageConfig: Record<ProcessingStage, { label: string; percent: number }> = {
+  uploading: { label: "Uploading…", percent: 20 },
+  extracting: { label: "Extracting data…", percent: 50 },
+  analyzing: { label: "Analyzing…", percent: 80 },
+  complete: { label: "Complete", percent: 100 },
+};
 
 interface UploadedFile {
   id: string;
   name: string;
   type: "transcript" | "lab" | "radiology";
   size: string;
+  stage: ProcessingStage;
 }
 
 const typeConfig = {
@@ -50,9 +60,37 @@ const FileUploadZone = () => {
       name: f.name,
       type: detectType(f.name),
       size: formatSize(f.size),
+      stage: "uploading" as ProcessingStage,
     }));
     setFiles((prev) => [...prev, ...newFiles]);
   };
+
+  // Simulate processing stages
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => {
+    files.forEach((file) => {
+      if (file.stage === "complete") return;
+      const nextStage: Record<ProcessingStage, ProcessingStage | null> = {
+        uploading: "extracting",
+        extracting: "analyzing",
+        analyzing: "complete",
+        complete: null,
+      };
+      const next = nextStage[file.stage];
+      if (!next) return;
+      const delay = 800 + Math.random() * 600;
+      const timer = setTimeout(() => {
+        setFiles((prev) =>
+          prev.map((f) => (f.id === file.id ? { ...f, stage: next } : f))
+        );
+      }, delay);
+      timersRef.current.push(timer);
+    });
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
+  }, [files]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -137,6 +175,7 @@ const FileUploadZone = () => {
                     name: f.name,
                     type: key,
                     size: formatSize(f.size),
+                    stage: "uploading" as ProcessingStage,
                   }));
                   setFiles((prev) => [...prev, ...newFiles]);
                 }}
@@ -176,13 +215,32 @@ const FileUploadZone = () => {
                       {cfg.label} · {file.size}
                     </p>
                   </div>
-                  <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
-                  <button
-                    onClick={() => removeFile(file.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground flex-shrink-0"
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {file.stage === "complete" ? (
+                      <CheckCircle2 className="w-4 h-4 text-accent" />
+                    ) : (
+                      <span className="text-[10px] text-primary animate-pulse">
+                        {stageConfig[file.stage].label}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => removeFile(file.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  {/* Progress bar */}
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary/50 rounded-b-lg overflow-hidden"
                   >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+                    <motion.div
+                      className="h-full bg-primary/60"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${stageConfig[file.stage].percent}%` }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                    />
+                  </motion.div>
                 </motion.div>
               );
             })}
