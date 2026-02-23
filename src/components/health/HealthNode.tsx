@@ -70,9 +70,10 @@ const descriptions: Record<string, { short: string; detail: string }> = {
 interface HealthNodeProps {
   label: string;
   index: number;
+  isActive?: boolean;
 }
 
-const HealthNode = ({ label, index }: HealthNodeProps) => {
+const HealthNode = ({ label, index, isActive = false }: HealthNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const Icon = iconMap[label] || Brain;
@@ -90,17 +91,27 @@ const HealthNode = ({ label, index }: HealthNodeProps) => {
         onClick={() => setIsExpanded(true)}
       >
         <motion.div
-          className="glass-card-hover p-4 sm:p-5 flex flex-col items-center gap-3 w-28 sm:w-32 relative z-10"
+          className={`glass-card-hover p-4 sm:p-5 flex flex-col items-center gap-3 w-28 sm:w-32 relative z-10 transition-colors ${
+            isActive ? "border-primary/50" : ""
+          }`}
           animate={{
             y: isHovered ? -4 : 0,
-            boxShadow: isHovered
+            scale: isActive ? [1, 1.04, 1] : 1,
+            boxShadow: isActive
+              ? "0 0 50px hsl(185 80% 55% / 0.35), 0 0 100px hsl(185 80% 55% / 0.12)"
+              : isHovered
               ? "0 0 40px hsl(185 80% 55% / 0.25), 0 0 80px hsl(185 80% 55% / 0.08)"
               : "0 0 20px hsl(185 80% 55% / 0.08)",
           }}
-          style={{ animation: `float ${4 + index * 0.3}s ease-in-out infinite` }}
+          transition={{
+            scale: isActive ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 },
+          }}
+          style={{ animation: isActive ? undefined : `float ${4 + index * 0.3}s ease-in-out infinite` }}
         >
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-            <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center border transition-colors ${
+            isActive ? "bg-primary/20 border-primary/40" : "bg-primary/10 border-primary/20"
+          }`}>
+            <Icon className={`w-5 h-5 sm:w-6 sm:h-6 text-primary ${isActive ? "animate-pulse" : ""}`} />
           </div>
           <span className="text-xs sm:text-sm text-foreground font-medium text-center leading-tight">
             {label}

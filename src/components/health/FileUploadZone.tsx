@@ -25,7 +25,11 @@ const typeConfig = {
   radiology: { label: "Radiology Report", icon: ScanLine, accept: ".pdf,.dcm,.jpg,.png" },
 };
 
-const FileUploadZone = () => {
+interface FileUploadZoneProps {
+  onProcessingChange?: (hasActiveFiles: boolean, completedCount: number) => void;
+}
+
+const FileUploadZone = ({ onProcessingChange }: FileUploadZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
 
@@ -91,6 +95,13 @@ const FileUploadZone = () => {
       timersRef.current = [];
     };
   }, [files]);
+
+  // Notify parent of processing state
+  useEffect(() => {
+    const active = files.some((f) => f.stage !== "complete");
+    const completed = files.filter((f) => f.stage === "complete").length;
+    onProcessingChange?.(active || files.length > 0, completed);
+  }, [files, onProcessingChange]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
