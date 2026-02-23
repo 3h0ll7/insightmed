@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import NeuralBackground from "@/components/health/NeuralBackground";
+import FileUploadZone from "@/components/health/FileUploadZone";
 import HealthFlowDiagram from "@/components/health/HealthFlowDiagram";
 import LabTrendChart from "@/components/health/LabTrendChart";
 import RiskMeter from "@/components/health/RiskMeter";
@@ -31,6 +32,11 @@ const Index = () => {
             </p>
           </div>
         </motion.div>
+
+        {/* File Upload */}
+        <div className="mb-6">
+          <FileUploadZone />
+        </div>
 
         {/* Flow Diagram */}
         <div className="mb-6">
