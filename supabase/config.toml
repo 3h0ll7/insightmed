@@ -1,0 +1,7 @@
+project_id = "olcdpsjvzmcubleucnka"
+
+[functions.classify-document]
+verify_jwt = false
+
+[functions.analyze-document]
+verify_jwt = false

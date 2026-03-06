@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import NeuralBackground from "@/components/health/NeuralBackground";
-import FileUploadZone from "@/components/health/FileUploadZone";
+import SmartInputZone from "@/components/health/SmartInputZone";
 import HealthFlowDiagram from "@/components/health/HealthFlowDiagram";
 import LabTrendChart from "@/components/health/LabTrendChart";
 import RiskMeter from "@/components/health/RiskMeter";
@@ -11,9 +11,10 @@ import { Brain } from "lucide-react";
 const Index = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleProcessingChange = useCallback((hasActive: boolean) => {
-    setIsProcessing(hasActive);
+  const handleProcessingChange = useCallback((isActive: boolean) => {
+    setIsProcessing(isActive);
   }, []);
+
   return (
     <div className="min-h-screen relative neural-gradient">
       <NeuralBackground />
@@ -26,8 +27,8 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-            <Brain className="w-5 h-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-[hsl(var(--glow-cyan)/0.1)] flex items-center justify-center border border-[hsl(var(--glow-cyan)/0.2)]">
+            <Brain className="w-5 h-5 text-glow-cyan" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-foreground glow-text">
@@ -39,9 +40,9 @@ const Index = () => {
           </div>
         </motion.div>
 
-        {/* File Upload */}
+        {/* Smart Input */}
         <div className="mb-6">
-          <FileUploadZone onProcessingChange={handleProcessingChange} />
+          <SmartInputZone onProcessingChange={handleProcessingChange} />
         </div>
 
         {/* Flow Diagram */}
