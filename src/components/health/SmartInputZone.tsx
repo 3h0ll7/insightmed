@@ -286,7 +286,7 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
                     <Button
                       size="sm"
                       onClick={handleTextSubmit}
-                      disabled={text.trim().length < 10 || stage === "classifying"}
+                      disabled={text.trim().length < 10 || (stage as AnalysisStage) === "classifying"}
                       className="bg-glow-cyan/20 text-glow-cyan border border-glow-cyan/30 hover:bg-glow-cyan/30"
                     >
                       <Sparkles className="w-3.5 h-3.5 mr-1" />
