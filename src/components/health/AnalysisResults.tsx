@@ -104,7 +104,7 @@ const exportToPdf = async (result: AnalysisResult, documentType: string) => {
       r.level.charAt(0).toUpperCase() + r.level.slice(1),
     ]);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: y,
       head: [["Factor", "Level"]],
       body: riskData,
