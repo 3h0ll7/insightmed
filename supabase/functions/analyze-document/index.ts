@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { text, documentType } = await req.json();
+    const { text, documentType, language } = await req.json();
     if (!text || typeof text !== "string") {
       return new Response(JSON.stringify({ error: "Text is required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
