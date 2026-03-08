@@ -27,6 +27,14 @@ const ar = {
   couldNotClassify: "تعذر التصنيف التلقائي. اختر يدوياً.",
   analysisFailed: "فشل التحليل",
 
+  // Confidence
+  confidenceScore: "درجة الثقة",
+  highConfidence: "ثقة عالية — تم قبول التصنيف تلقائياً",
+  mediumConfidence: "ثقة متوسطة — يرجى تأكيد التصنيف",
+  lowConfidence: "ثقة منخفضة — يرجى اختيار نوع المستند يدوياً",
+  confirmClassification: "تأكيد التصنيف",
+  reasoning: "السبب:",
+
   // Stage labels
   stageClassifying: "جاري تصنيف المستند…",
   stageClassified: "تم تصنيف المستند",
