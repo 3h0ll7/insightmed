@@ -1,7 +1,8 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
-const labData = [
+const defaultLabData = [
   { month: "Jan", glucose: 95, cholesterol: 210, hba1c: 5.6 },
   { month: "Feb", glucose: 102, cholesterol: 205, hba1c: 5.7 },
   { month: "Mar", glucose: 98, cholesterol: 198, hba1c: 5.5 },
@@ -11,6 +12,16 @@ const labData = [
   { month: "Jul", glucose: 88, cholesterol: 178, hba1c: 5.3 },
   { month: "Aug", glucose: 90, cholesterol: 175, hba1c: 5.2 },
 ];
+
+interface ExtractedEntity {
+  entity: string;
+  type: string;
+  value?: string;
+}
+
+interface LabTrendChartProps {
+  extractedEntities?: ExtractedEntity[] | null;
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
@@ -24,13 +35,61 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-const LabTrendChart = () => {
+const parseNumericValue = (val: string): number | null => {
+  const match = val.match(/([\d.]+)/);
+  return match ? parseFloat(match[1]) : null;
+};
+
+const LabTrendChart = ({ extractedEntities }: LabTrendChartProps) => {
+  const entityData = useMemo(() => {
+    if (!extractedEntities || extractedEntities.length === 0) return null;
+
+    const measurements = extractedEntities
+      .filter((e) => e.value)
+      .map((e) => {
+        const num = parseNumericValue(e.value!);
+        return num !== null ? { name: e.entity, value: num, unit: e.value!.replace(/[\d.]+\s*/, "") } : null;
+      })
+      .filter(Boolean) as Array<{ name: string; value: number; unit: string }>;
+
+    return measurements.length > 0 ? measurements : null;
+  }, [extractedEntities]);
+
+  if (entityData) {
+    return (
+      <motion.div className="warm-card p-5"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+        key="entity-chart">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-serif font-semibold text-foreground">Extracted Measurements</h3>
+          <span className="text-[10px] text-accent font-medium px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20">Live Data</span>
+        </div>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={entityData} layout="vertical" margin={{ left: 10, right: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(37 15% 88%)" horizontal={false} />
+            <XAxis type="number" tick={{ fill: "hsl(220 15% 45%)", fontSize: 10 }} axisLine={{ stroke: "hsl(37 15% 85%)" }} />
+            <YAxis type="category" dataKey="name" tick={{ fill: "hsl(220 15% 45%)", fontSize: 10 }} axisLine={{ stroke: "hsl(37 15% 85%)" }} width={100} />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar dataKey="value" fill="hsl(38 85% 55%)" radius={[0, 4, 4, 0]} barSize={16} />
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {entityData.map((d, i) => (
+            <span key={i} className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+              {d.name}: <strong className="text-foreground">{d.value}</strong> {d.unit}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div className="warm-card p-5"
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.5 }}>
       <h3 className="text-sm font-serif font-semibold text-foreground mb-4">Lab Value Trends</h3>
       <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={labData}>
+        <LineChart data={defaultLabData}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(37 15% 88%)" />
           <XAxis dataKey="month" tick={{ fill: "hsl(220 15% 45%)", fontSize: 11 }} axisLine={{ stroke: "hsl(37 15% 85%)" }} />
           <YAxis tick={{ fill: "hsl(220 15% 45%)", fontSize: 11 }} axisLine={{ stroke: "hsl(37 15% 85%)" }} />
