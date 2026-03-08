@@ -10,26 +10,16 @@ import { toast } from "@/hooks/use-toast";
 import AnalysisResults from "./AnalysisResults";
 
 const DOCUMENT_TYPES = [
-  "Radiology Report",
-  "Lab Results",
-  "Prescription",
-  "Visit Transcript",
-  "Discharge Summary",
-  "Other Medical Document",
+  "Radiology Report", "Lab Results", "Prescription", "Visit Transcript", "Discharge Summary", "Other Medical Document",
 ] as const;
 
 type DocumentType = (typeof DOCUMENT_TYPES)[number];
 type AnalysisStage = "idle" | "classifying" | "classified" | "extracting" | "structuring" | "risk_mapping" | "generating" | "complete";
 
 const stageLabels: Record<AnalysisStage, string> = {
-  idle: "",
-  classifying: "Classifying document…",
-  classified: "Document classified",
-  extracting: "Extracting medical entities…",
-  structuring: "Structuring data…",
-  risk_mapping: "Mapping risk factors…",
-  generating: "Generating guidance…",
-  complete: "Analysis complete",
+  idle: "", classifying: "Classifying document…", classified: "Document classified",
+  extracting: "Extracting medical entities…", structuring: "Structuring data…",
+  risk_mapping: "Mapping risk factors…", generating: "Generating guidance…", complete: "Analysis complete",
 };
 
 const stagePercent: Record<AnalysisStage, number> = {
@@ -38,9 +28,10 @@ const stagePercent: Record<AnalysisStage, number> = {
 
 interface SmartInputZoneProps {
   onProcessingChange?: (isProcessing: boolean) => void;
+  onAnalysisComplete?: (data: any | null) => void;
 }
 
-const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
+const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [text, setText] = useState("");
   const [fileName, setFileName] = useState("");
@@ -108,7 +99,9 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
       clearInterval(interval);
       if (fnError) throw new Error(fnError.message);
       if (data?.error) throw new Error(data.error);
-      setAnalysisResult(data); setStage("complete");
+      setAnalysisResult(data);
+      setStage("complete");
+      onAnalysisComplete?.(data);
     } catch (err: any) {
       clearInterval(interval); setStage("classified"); setError(err.message || "Analysis failed.");
       toast({ title: "Analysis failed", description: err.message, variant: "destructive" });
@@ -116,20 +109,18 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
   };
 
   const handleTextSubmit = () => { if (text.trim().length >= 10) classifyDocument(text); };
-  const reset = () => { setText(""); setFileName(""); setStage("idle"); setClassifiedType(null); setAnalysisResult(null); setError(""); setShowOverride(false); };
+  const reset = () => {
+    setText(""); setFileName(""); setStage("idle"); setClassifiedType(null);
+    setAnalysisResult(null); setError(""); setShowOverride(false);
+    onAnalysisComplete?.(null);
+  };
   const isAnalyzing = ["extracting", "structuring", "risk_mapping", "generating"].includes(stage);
 
   return (
     <div className="space-y-6">
-      <motion.div
-        className="warm-card p-6 sm:p-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <motion.div className="warm-card p-6 sm:p-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <h3 className="text-lg font-serif font-semibold text-foreground mb-5 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-accent" />
-          Upload Your Medical Document
+          <Sparkles className="w-5 h-5 text-accent" /> Upload Your Medical Document
         </h3>
 
         {stage === "idle" || (stage === "classified" && !analysisResult) ? (
@@ -149,9 +140,7 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
                   className={`relative border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer ${
                     isDragging ? "border-accent bg-accent/5" : "border-border hover:border-accent/40 hover:bg-accent/5"
                   }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
+                  onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}
                   onClick={() => document.getElementById("smart-file-input")?.click()}
                   animate={isDragging ? { scale: 1.01 } : { scale: 1 }}
                 >
@@ -171,17 +160,13 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
 
               <TabsContent value="paste">
                 <div className="space-y-3">
-                  <Textarea
-                    placeholder="Paste your medical document text here…"
-                    value={text} onChange={(e) => setText(e.target.value)}
-                    className="min-h-[160px] bg-card border-border focus:border-accent/50 resize-none text-sm"
-                  />
+                  <Textarea placeholder="Paste your medical document text here…" value={text} onChange={(e) => setText(e.target.value)}
+                    className="min-h-[160px] bg-card border-border focus:border-accent/50 resize-none text-sm" />
                   <div className="flex justify-between items-center">
                     <p className="text-xs text-muted-foreground">{text.length > 0 ? `${text.length} characters` : "Minimum 10 characters"}</p>
                     <Button size="sm" onClick={handleTextSubmit}
                       disabled={text.trim().length < 10 || (stage as AnalysisStage) === "classifying"}
-                      className="bg-accent text-accent-foreground hover:bg-accent/90 font-medium"
-                    >
+                      className="bg-accent text-accent-foreground hover:bg-accent/90 font-medium">
                       <Sparkles className="w-3.5 h-3.5 mr-1" /> Classify
                     </Button>
                   </div>
@@ -200,7 +185,6 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
           </>
         ) : null}
 
-        {/* Classification loading */}
         <AnimatePresence>
           {stage === "classifying" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-4 flex items-center gap-3">
@@ -210,7 +194,6 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
           )}
         </AnimatePresence>
 
-        {/* Classification result + Start Analysis */}
         <AnimatePresence>
           {(stage === "classified" || isAnalyzing || stage === "complete") && classifiedType && !analysisResult && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 space-y-4">
