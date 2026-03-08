@@ -92,12 +92,26 @@ const ar = {
   "Health Timeline_detail": "عرض تفاعلي زمني لجميع الأحداث الصحية والاتجاهات والمعالم.",
 
   // Document types
+  "CBC Blood Test": "تحليل صورة الدم الكاملة",
+  "Blood Glucose Test": "تحليل سكر الدم",
+  "Lipid Profile": "تحليل الدهون",
+  "Liver Function Test": "تحليل وظائف الكبد",
+  "Kidney Function Test": "تحليل وظائف الكلى",
+  "Thyroid Function Test": "تحليل الغدة الدرقية",
+  "General Lab Results": "نتائج مختبرية عامة",
+  "Chest X-Ray": "أشعة سينية للصدر",
+  "CT Scan": "أشعة مقطعية",
+  MRI: "رنين مغناطيسي",
+  Ultrasound: "موجات فوق صوتية",
+  "General Radiology Report": "تقرير أشعة عام",
   "Radiology Report": "تقرير أشعة",
   Prescription: "وصفة طبية",
+  "Medical Visit Report": "تقرير زيارة طبية",
   "Visit Transcript_type": "نص زيارة",
   "Discharge Summary": "ملخص خروج",
   "Other Medical Document": "مستند طبي آخر",
   "Medical Document": "مستند طبي",
+  detectedKeywords: "الكلمات المفتاحية:",
 
   // LabTrendChart
   extractedMeasurements: "القياسات المستخرجة",

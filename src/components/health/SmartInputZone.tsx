@@ -321,6 +321,16 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                     </p>
                   )}
 
+                  {detectedKeywords.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="text-xs font-medium text-foreground/70">{t("detectedKeywords")}</span>
+                      {detectedKeywords.map((kw, i) => (
+                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground">{kw}</span>
+                      ))}
+                    </div>
+                  )
+                  )}
+
                   {confidence >= 60 && confidence < 80 && !confirmed && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-3">
                       <Button size="sm" onClick={() => setConfirmed(true)}

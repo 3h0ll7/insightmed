@@ -92,12 +92,26 @@ const en = {
   "Health Timeline_detail": "Interactive timeline display of all health events, trends, and milestones.",
 
   // Document types
+  "CBC Blood Test": "CBC Blood Test",
+  "Blood Glucose Test": "Blood Glucose Test",
+  "Lipid Profile": "Lipid Profile",
+  "Liver Function Test": "Liver Function Test",
+  "Kidney Function Test": "Kidney Function Test",
+  "Thyroid Function Test": "Thyroid Function Test",
+  "General Lab Results": "General Lab Results",
+  "Chest X-Ray": "Chest X-Ray",
+  "CT Scan": "CT Scan",
+  MRI: "MRI",
+  Ultrasound: "Ultrasound",
+  "General Radiology Report": "General Radiology Report",
   "Radiology Report": "Radiology Report",
   Prescription: "Prescription",
+  "Medical Visit Report": "Medical Visit Report",
   "Visit Transcript_type": "Visit Transcript",
   "Discharge Summary": "Discharge Summary",
   "Other Medical Document": "Other Medical Document",
   "Medical Document": "Medical Document",
+  detectedKeywords: "Keywords:",
 
   // LabTrendChart
   extractedMeasurements: "Extracted Measurements",
