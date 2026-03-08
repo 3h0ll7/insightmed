@@ -23,7 +23,7 @@ interface SmartInputZoneProps {
 }
 
 const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZoneProps) => {
-  const { t } = useApp();
+  const { t, lang } = useApp();
 
   const stageLabels: Record<AnalysisStage, string> = {
     idle: "", classifying: t("stageClassifying"), classified: t("stageClassified"),
@@ -146,7 +146,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
     let stageIdx = 0; setStage(stages[0]);
     const interval = setInterval(() => { stageIdx++; if (stageIdx < stages.length) setStage(stages[stageIdx]); }, 2000);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document" } });
+      const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document", language: lang } });
       clearInterval(interval);
       if (fnError) throw new Error(fnError.message);
       if (data?.error) throw new Error(data.error);
