@@ -11,7 +11,10 @@ import AnalysisResults from "./AnalysisResults";
 import { useApp } from "@/i18n/LanguageContext";
 
 const DOCUMENT_TYPES = [
-  "Radiology Report", "Lab Results", "Prescription", "Visit Transcript", "Discharge Summary", "Other Medical Document",
+  "CBC Blood Test", "Blood Glucose Test", "Lipid Profile", "Liver Function Test",
+  "Kidney Function Test", "Thyroid Function Test", "General Lab Results",
+  "Chest X-Ray", "CT Scan", "MRI", "Ultrasound", "General Radiology Report",
+  "Prescription", "Medical Visit Report", "Discharge Summary", "Other Medical Document",
 ] as const;
 
 type DocumentType = (typeof DOCUMENT_TYPES)[number];
