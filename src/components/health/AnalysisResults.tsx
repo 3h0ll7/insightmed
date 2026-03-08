@@ -159,7 +159,7 @@ const exportToPdf = async (result: AnalysisResult, documentType: string) => {
       e.value || "—",
     ]);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: y,
       head: [["Entity", "Type", "Value"]],
       body: entityData,
