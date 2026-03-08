@@ -179,7 +179,7 @@ const SmartInputZone = ({ onProcessingChange }: SmartInputZoneProps) => {
                   <div className="flex justify-between items-center">
                     <p className="text-xs text-muted-foreground">{text.length > 0 ? `${text.length} characters` : "Minimum 10 characters"}</p>
                     <Button size="sm" onClick={handleTextSubmit}
-                      disabled={text.trim().length < 10 || stage === "classifying"}
+                      disabled={text.trim().length < 10 || (stage as AnalysisStage) === "classifying"}
                       className="bg-accent text-accent-foreground hover:bg-accent/90 font-medium"
                     >
                       <Sparkles className="w-3.5 h-3.5 mr-1" /> Classify
