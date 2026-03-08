@@ -1,16 +1,17 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { t } from "@/i18n/useTranslation";
 
 const defaultLabData = [
-  { month: "Jan", glucose: 95, cholesterol: 210, hba1c: 5.6 },
-  { month: "Feb", glucose: 102, cholesterol: 205, hba1c: 5.7 },
-  { month: "Mar", glucose: 98, cholesterol: 198, hba1c: 5.5 },
-  { month: "Apr", glucose: 110, cholesterol: 195, hba1c: 5.8 },
-  { month: "May", glucose: 105, cholesterol: 188, hba1c: 5.6 },
-  { month: "Jun", glucose: 92, cholesterol: 182, hba1c: 5.4 },
-  { month: "Jul", glucose: 88, cholesterol: 178, hba1c: 5.3 },
-  { month: "Aug", glucose: 90, cholesterol: 175, hba1c: 5.2 },
+  { month: "يناير", glucose: 95, cholesterol: 210, hba1c: 5.6 },
+  { month: "فبراير", glucose: 102, cholesterol: 205, hba1c: 5.7 },
+  { month: "مارس", glucose: 98, cholesterol: 198, hba1c: 5.5 },
+  { month: "أبريل", glucose: 110, cholesterol: 195, hba1c: 5.8 },
+  { month: "مايو", glucose: 105, cholesterol: 188, hba1c: 5.6 },
+  { month: "يونيو", glucose: 92, cholesterol: 182, hba1c: 5.4 },
+  { month: "يوليو", glucose: 88, cholesterol: 178, hba1c: 5.3 },
+  { month: "أغسطس", glucose: 90, cholesterol: 175, hba1c: 5.2 },
 ];
 
 interface ExtractedEntity {
@@ -61,8 +62,8 @@ const LabTrendChart = ({ extractedEntities }: LabTrendChartProps) => {
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
         key="entity-chart">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-serif font-semibold text-foreground">Extracted Measurements</h3>
-          <span className="text-[10px] text-accent font-medium px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20">Live Data</span>
+          <h3 className="text-sm font-serif font-semibold text-foreground">{t("extractedMeasurements")}</h3>
+          <span className="text-[10px] text-accent font-medium px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20">{t("liveData")}</span>
         </div>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={entityData} layout="vertical" margin={{ left: 10, right: 20 }}>
@@ -87,7 +88,7 @@ const LabTrendChart = ({ extractedEntities }: LabTrendChartProps) => {
   return (
     <motion.div className="warm-card p-5"
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.5 }}>
-      <h3 className="text-sm font-serif font-semibold text-foreground mb-4">Lab Value Trends</h3>
+      <h3 className="text-sm font-serif font-semibold text-foreground mb-4">{t("labValueTrends")}</h3>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={defaultLabData}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(37 15% 88%)" />
@@ -95,9 +96,9 @@ const LabTrendChart = ({ extractedEntities }: LabTrendChartProps) => {
           <YAxis tick={{ fill: "hsl(220 15% 45%)", fontSize: 11 }} axisLine={{ stroke: "hsl(37 15% 85%)" }} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="glucose" stroke="hsl(38 85% 55%)" strokeWidth={2}
-            dot={{ fill: "hsl(38 85% 55%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(38 85% 55%)" }} name="Glucose" />
+            dot={{ fill: "hsl(38 85% 55%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(38 85% 55%)" }} name="جلوكوز" />
           <Line type="monotone" dataKey="cholesterol" stroke="hsl(170 55% 42%)" strokeWidth={2}
-            dot={{ fill: "hsl(170 55% 42%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(170 55% 42%)" }} name="Cholesterol" />
+            dot={{ fill: "hsl(170 55% 42%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(170 55% 42%)" }} name="كوليسترول" />
           <Line type="monotone" dataKey="hba1c" stroke="hsl(220 35% 22%)" strokeWidth={2}
             dot={{ fill: "hsl(220 35% 22%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(220 35% 22%)" }} name="HbA1c" />
         </LineChart>

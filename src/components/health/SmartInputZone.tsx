@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import AnalysisResults from "./AnalysisResults";
+import { t } from "@/i18n/useTranslation";
 
 const DOCUMENT_TYPES = [
   "Radiology Report", "Lab Results", "Prescription", "Visit Transcript", "Discharge Summary", "Other Medical Document",
@@ -17,9 +18,9 @@ type DocumentType = (typeof DOCUMENT_TYPES)[number];
 type AnalysisStage = "idle" | "classifying" | "classified" | "extracting" | "structuring" | "risk_mapping" | "generating" | "complete";
 
 const stageLabels: Record<AnalysisStage, string> = {
-  idle: "", classifying: "Classifying document…", classified: "Document classified",
-  extracting: "Extracting medical entities…", structuring: "Structuring data…",
-  risk_mapping: "Mapping risk factors…", generating: "Generating guidance…", complete: "Analysis complete",
+  idle: "", classifying: t("stageClassifying"), classified: t("stageClassified"),
+  extracting: t("stageExtracting"), structuring: t("stageStructuring"),
+  risk_mapping: t("stageRiskMapping"), generating: t("stageGenerating"), complete: t("stageComplete"),
 };
 
 const stagePercent: Record<AnalysisStage, number> = {
@@ -55,16 +56,16 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
 
   const handleFile = async (file: File) => {
     setError(""); setAnalysisResult(null); setClassifiedType(null); setStage("idle");
-    if (file.size > 20 * 1024 * 1024) { setError("File too large. Maximum 20MB."); return; }
+    if (file.size > 20 * 1024 * 1024) { setError(t("fileTooLarge")); return; }
     const supported = [".pdf", ".docx", ".doc", ".txt", ".csv", ".jpg", ".jpeg", ".png"];
     const ext = "." + file.name.split(".").pop()?.toLowerCase();
-    if (!supported.includes(ext)) { setError(`Unsupported format (${ext}).`); return; }
+    if (!supported.includes(ext)) { setError(`${t("unsupportedFormat")} (${ext}).`); return; }
     setFileName(file.name);
     try {
       const content = await readFileAsText(file);
       setText(content.slice(0, 5000));
       classifyDocument(content.slice(0, 3000));
-    } catch { setText(`[File: ${file.name}] — Content could not be read as text.`); }
+    } catch { setText(`[${file.name}]`); }
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -84,7 +85,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
       setStage("classified"); onProcessingChange?.(false);
     } catch (err: any) {
       setStage("classified"); setClassifiedType("Other Medical Document"); setConfidence(0); onProcessingChange?.(false);
-      toast({ title: "Classification notice", description: "Could not auto-classify. Select manually.", variant: "destructive" });
+      toast({ title: t("classificationNotice"), description: t("couldNotClassify"), variant: "destructive" });
     }
   };
 
@@ -103,8 +104,8 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
       setStage("complete");
       onAnalysisComplete?.(data);
     } catch (err: any) {
-      clearInterval(interval); setStage("classified"); setError(err.message || "Analysis failed.");
-      toast({ title: "Analysis failed", description: err.message, variant: "destructive" });
+      clearInterval(interval); setStage("classified"); setError(err.message || t("analysisFailed"));
+      toast({ title: t("analysisFailed"), description: err.message, variant: "destructive" });
     } finally { onProcessingChange?.(false); }
   };
 
@@ -116,11 +117,13 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   };
   const isAnalyzing = ["extracting", "structuring", "risk_mapping", "generating"].includes(stage);
 
+  const getDocTypeLabel = (type: string) => t(type) || type;
+
   return (
     <div className="space-y-6">
       <motion.div className="warm-card p-6 sm:p-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <h3 className="text-lg font-serif font-semibold text-foreground mb-5 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-accent" /> Upload Your Medical Document
+          <Sparkles className="w-5 h-5 text-accent" /> {t("uploadTitle")}
         </h3>
 
         {stage === "idle" || (stage === "classified" && !analysisResult) ? (
@@ -128,10 +131,10 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
             <Tabs defaultValue="upload" className="w-full">
               <TabsList className="w-full bg-secondary border border-border">
                 <TabsTrigger value="upload" className="flex-1 gap-2 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm">
-                  <Upload className="w-3.5 h-3.5" /> Upload File
+                  <Upload className="w-3.5 h-3.5" /> {t("uploadFile")}
                 </TabsTrigger>
                 <TabsTrigger value="paste" className="flex-1 gap-2 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm">
-                  <ClipboardPaste className="w-3.5 h-3.5" /> Paste Text
+                  <ClipboardPaste className="w-3.5 h-3.5" /> {t("pasteText")}
                 </TabsTrigger>
               </TabsList>
 
@@ -151,8 +154,8 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                       <Upload className="w-7 h-7 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm text-foreground font-medium">{isDragging ? "Drop file here" : "Drag & drop your medical record"}</p>
-                      <p className="text-xs text-muted-foreground mt-1.5">PDF, DOCX, TXT, CSV, JPG, PNG — max 20MB</p>
+                      <p className="text-sm text-foreground font-medium">{isDragging ? t("dropHere") : t("dragDrop")}</p>
+                      <p className="text-xs text-muted-foreground mt-1.5">{t("fileFormats")}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -160,14 +163,14 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
 
               <TabsContent value="paste">
                 <div className="space-y-3">
-                  <Textarea placeholder="Paste your medical document text here…" value={text} onChange={(e) => setText(e.target.value)}
+                  <Textarea placeholder={t("pastePlaceholder")} value={text} onChange={(e) => setText(e.target.value)}
                     className="min-h-[160px] bg-card border-border focus:border-accent/50 resize-none text-sm" />
                   <div className="flex justify-between items-center">
-                    <p className="text-xs text-muted-foreground">{text.length > 0 ? `${text.length} characters` : "Minimum 10 characters"}</p>
+                    <p className="text-xs text-muted-foreground">{text.length > 0 ? `${text.length} ${t("characters")}` : t("minChars")}</p>
                     <Button size="sm" onClick={handleTextSubmit}
                       disabled={text.trim().length < 10 || (stage as AnalysisStage) === "classifying"}
                       className="bg-accent text-accent-foreground hover:bg-accent/90 font-medium">
-                      <Sparkles className="w-3.5 h-3.5 mr-1" /> Classify
+                      <Sparkles className="w-3.5 h-3.5 ml-1" /> {t("classify")}
                     </Button>
                   </div>
                 </div>
@@ -189,7 +192,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
           {stage === "classifying" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-4 flex items-center gap-3">
               <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
-              <span className="text-sm text-muted-foreground">AI is classifying your document…</span>
+              <span className="text-sm text-muted-foreground">{t("classifying")}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -200,13 +203,13 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-teal-accent" />
-                  <span className="text-sm text-muted-foreground">Detected:</span>
-                  <Badge className="bg-accent/15 text-accent border-accent/25 hover:bg-accent/20">{classifiedType}</Badge>
+                  <span className="text-sm text-muted-foreground">{t("detected")}</span>
+                  <Badge className="bg-accent/15 text-accent border-accent/25 hover:bg-accent/20">{getDocTypeLabel(classifiedType)}</Badge>
                   {confidence > 0 && <span className="text-xs text-muted-foreground">{confidence}%</span>}
                 </div>
                 <button onClick={() => setShowOverride(!showOverride)}
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-                  Override <ChevronDown className={`w-3 h-3 transition-transform ${showOverride ? "rotate-180" : ""}`} />
+                  {t("override")} <ChevronDown className={`w-3 h-3 transition-transform ${showOverride ? "rotate-180" : ""}`} />
                 </button>
               </div>
 
@@ -217,7 +220,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                       <button key={type} onClick={() => { setClassifiedType(type); setShowOverride(false); }}
                         className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                           classifiedType === type ? "bg-accent/15 border-accent/40 text-accent" : "border-border text-muted-foreground hover:border-accent/30 hover:text-foreground"
-                        }`}>{type}</button>
+                        }`}>{getDocTypeLabel(type)}</button>
                     ))}
                   </motion.div>
                 )}
@@ -241,9 +244,9 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
               {stage === "classified" && (
                 <div className="flex gap-3">
                   <Button onClick={startAnalysis} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm py-3 h-auto">
-                    <Sparkles className="w-4 h-4 mr-2" /> START ANALYSIS
+                    <Sparkles className="w-4 h-4 ml-2" /> {t("startAnalysis")}
                   </Button>
-                  <Button variant="outline" onClick={reset} className="border-border text-muted-foreground hover:text-foreground">Clear</Button>
+                  <Button variant="outline" onClick={reset} className="border-border text-muted-foreground hover:text-foreground">{t("clear")}</Button>
                 </div>
               )}
             </motion.div>
@@ -253,7 +256,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
 
       <AnimatePresence>
         {analysisResult && stage === "complete" && (
-          <AnalysisResults result={analysisResult} documentType={classifiedType || "Medical Document"} onReset={reset} />
+          <AnalysisResults result={analysisResult} documentType={classifiedType || t("Medical Document")} onReset={reset} />
         )}
       </AnimatePresence>
     </div>

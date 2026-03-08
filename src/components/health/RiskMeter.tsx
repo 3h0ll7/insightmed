@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { t } from "@/i18n/useTranslation";
 
 interface RiskMeterProps {
   value?: number;
@@ -6,7 +7,8 @@ interface RiskMeterProps {
   animated?: boolean;
 }
 
-const RiskMeter = ({ value = 32, label = "Overall Risk", animated = false }: RiskMeterProps) => {
+const RiskMeter = ({ value = 32, label, animated = false }: RiskMeterProps) => {
+  const displayLabel = label || t("overallRisk");
   const circumference = 2 * Math.PI * 54;
   const offset = circumference - (value / 100) * circumference * 0.75;
   const rotation = -225;
@@ -18,18 +20,18 @@ const RiskMeter = ({ value = 32, label = "Overall Risk", animated = false }: Ris
   };
 
   const getRiskLabel = (v: number) => {
-    if (v < 30) return "Low";
-    if (v < 60) return "Moderate";
-    return "High";
+    if (v < 30) return t("low");
+    if (v < 60) return t("moderate");
+    return t("high");
   };
 
   return (
     <motion.div className="warm-card p-5 flex flex-col items-center"
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: animated ? 0 : 1.4, duration: 0.5 }}>
       <div className="flex items-center gap-2 mb-4">
-        <h3 className="text-sm font-serif font-semibold text-foreground">{label}</h3>
+        <h3 className="text-sm font-serif font-semibold text-foreground">{displayLabel}</h3>
         {animated && (
-          <span className="text-[10px] text-accent font-medium px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20">Live</span>
+          <span className="text-[10px] text-accent font-medium px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20">{t("live")}</span>
         )}
       </div>
       <div className="relative w-32 h-32">
