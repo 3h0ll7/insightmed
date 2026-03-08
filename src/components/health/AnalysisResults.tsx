@@ -77,7 +77,7 @@ const exportToPdf = async (result: AnalysisResult, documentType: string) => {
       f.explanation,
     ]);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: y,
       head: [["Finding", "Significance", "Explanation"]],
       body: findingsData,
