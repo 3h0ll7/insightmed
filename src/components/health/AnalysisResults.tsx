@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { AlertTriangle, CheckCircle2, Info, Shield, Pill, Stethoscope, Activity, ArrowLeft } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Shield, Pill, Stethoscope, Activity, ArrowLeft, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 
 interface KeyFinding { finding: string; significance: "normal" | "attention" | "critical"; explanation: string; }
 interface RiskFactor { factor: string; level: "low" | "moderate" | "high"; }
@@ -25,6 +26,173 @@ const entityIcons: Record<string, typeof Pill> = {
   condition: Activity, medication: Pill, procedure: Stethoscope, measurement: Activity, anatomy: Stethoscope,
 };
 
+const exportToPdf = async (result: AnalysisResult, documentType: string) => {
+  try {
+    const { default: jsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let y = 20;
+
+    // Header
+    doc.setFillColor(43, 57, 73);
+    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Health Intelligence Report", margin, 18);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Document Type: ${documentType}  |  Generated: ${new Date().toLocaleDateString()}`, margin, 30);
+    y = 50;
+
+    // Summary
+    doc.setTextColor(43, 57, 73);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Summary", margin, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    const summaryLines = doc.splitTextToSize(result.summary, contentWidth);
+    doc.text(summaryLines, margin, y);
+    y += summaryLines.length * 5 + 10;
+
+    // Key Findings table
+    doc.setTextColor(43, 57, 73);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Key Findings", margin, y);
+    y += 3;
+
+    const findingsData = result.key_findings.map((f) => [
+      f.finding,
+      f.significance.charAt(0).toUpperCase() + f.significance.slice(1),
+      f.explanation,
+    ]);
+
+    (doc as any).autoTable({
+      startY: y,
+      head: [["Finding", "Significance", "Explanation"]],
+      body: findingsData,
+      margin: { left: margin, right: margin },
+      headStyles: { fillColor: [43, 57, 73], fontSize: 9 },
+      bodyStyles: { fontSize: 8, textColor: [60, 60, 60] },
+      columnStyles: { 0: { cellWidth: 45 }, 1: { cellWidth: 25 }, 2: { cellWidth: "auto" } },
+      theme: "grid",
+      styles: { cellPadding: 3, lineColor: [200, 200, 200], lineWidth: 0.2 },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 12;
+
+    // Risk Factors table
+    if (y > 250) { doc.addPage(); y = 20; }
+    doc.setTextColor(43, 57, 73);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Risk Factors", margin, y);
+    y += 3;
+
+    const riskData = result.risk_factors.map((r) => [
+      r.factor,
+      r.level.charAt(0).toUpperCase() + r.level.slice(1),
+    ]);
+
+    (doc as any).autoTable({
+      startY: y,
+      head: [["Factor", "Level"]],
+      body: riskData,
+      margin: { left: margin, right: margin },
+      headStyles: { fillColor: [43, 57, 73], fontSize: 9 },
+      bodyStyles: { fontSize: 8, textColor: [60, 60, 60] },
+      theme: "grid",
+      styles: { cellPadding: 3, lineColor: [200, 200, 200], lineWidth: 0.2 },
+      didParseCell: (data: any) => {
+        if (data.section === "body" && data.column.index === 1) {
+          const val = data.cell.raw?.toString().toLowerCase();
+          if (val === "high") data.cell.styles.textColor = [220, 38, 38];
+          else if (val === "moderate") data.cell.styles.textColor = [204, 128, 0];
+          else data.cell.styles.textColor = [34, 139, 115];
+        }
+      },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 12;
+
+    // Recommendations
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setTextColor(43, 57, 73);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Recommendations", margin, y);
+    y += 8;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+
+    result.recommendations.forEach((rec, i) => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      const lines = doc.splitTextToSize(`${i + 1}. ${rec}`, contentWidth);
+      doc.text(lines, margin, y);
+      y += lines.length * 4.5 + 3;
+    });
+
+    y += 5;
+
+    // Entities
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setTextColor(43, 57, 73);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Detected Medical Entities", margin, y);
+    y += 3;
+
+    const entityData = result.medical_entities.map((e) => [
+      e.entity,
+      e.type.charAt(0).toUpperCase() + e.type.slice(1),
+      e.value || "—",
+    ]);
+
+    (doc as any).autoTable({
+      startY: y,
+      head: [["Entity", "Type", "Value"]],
+      body: entityData,
+      margin: { left: margin, right: margin },
+      headStyles: { fillColor: [43, 57, 73], fontSize: 9 },
+      bodyStyles: { fontSize: 8, textColor: [60, 60, 60] },
+      theme: "grid",
+      styles: { cellPadding: 3, lineColor: [200, 200, 200], lineWidth: 0.2 },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 15;
+
+    // Disclaimer
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFillColor(255, 248, 230);
+    doc.roundedRect(margin, y - 3, contentWidth, 20, 2, 2, "F");
+    doc.setFontSize(7);
+    doc.setTextColor(150, 120, 50);
+    doc.setFont("helvetica", "bold");
+    doc.text("DISCLAIMER", margin + 4, y + 3);
+    doc.setFont("helvetica", "normal");
+    const discLines = doc.splitTextToSize(
+      "This analysis is for informational purposes only and does not constitute medical advice, diagnosis, or treatment. Always consult with a qualified healthcare professional for medical decisions.",
+      contentWidth - 8
+    );
+    doc.text(discLines, margin + 4, y + 8);
+
+    doc.save(`health-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast({ title: "PDF exported", description: "Report downloaded successfully." });
+  } catch (err) {
+    console.error("PDF export error:", err);
+    toast({ title: "Export failed", description: "Could not generate PDF.", variant: "destructive" });
+  }
+};
+
 const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps) => {
   return (
     <motion.div className="space-y-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -36,15 +204,20 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
             <h3 className="text-lg font-serif font-semibold text-foreground">Analysis Complete</h3>
             <Badge className="bg-accent/15 text-accent border-accent/25 text-xs">{documentType}</Badge>
           </div>
-          <Button variant="outline" size="sm" onClick={onReset} className="gap-1 text-muted-foreground">
-            <ArrowLeft className="w-3 h-3" /> New
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => exportToPdf(result, documentType)}
+              className="gap-1.5 text-accent border-accent/25 hover:bg-accent/10">
+              <Download className="w-3.5 h-3.5" /> Export PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={onReset} className="gap-1 text-muted-foreground">
+              <ArrowLeft className="w-3 h-3" /> New
+            </Button>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">{result.summary}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Key Findings */}
         <div className="warm-card p-6">
           <h4 className="text-sm font-serif font-semibold text-foreground mb-4 flex items-center gap-2">
             <Stethoscope className="w-4 h-4 text-accent" /> Key Findings
@@ -69,7 +242,6 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
           </div>
         </div>
 
-        {/* Risk Factors */}
         <div className="warm-card p-6">
           <h4 className="text-sm font-serif font-semibold text-foreground mb-4 flex items-center gap-2">
             <Shield className="w-4 h-4 text-accent" /> Risk Factors
@@ -88,7 +260,6 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
           </div>
         </div>
 
-        {/* Recommendations */}
         <div className="warm-card p-6">
           <h4 className="text-sm font-serif font-semibold text-foreground mb-4 flex items-center gap-2">
             <Info className="w-4 h-4 text-accent" /> Recommendations
@@ -104,7 +275,6 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
           </ul>
         </div>
 
-        {/* Entities */}
         <div className="warm-card p-6">
           <h4 className="text-sm font-serif font-semibold text-foreground mb-4 flex items-center gap-2">
             <Activity className="w-4 h-4 text-accent" /> Detected Entities
@@ -125,7 +295,6 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
         </div>
       </div>
 
-      {/* Disclaimer */}
       <div className="warm-card p-4 border-warm-amber/20">
         <p className="text-xs text-muted-foreground flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-warm-amber flex-shrink-0 mt-0.5" />
