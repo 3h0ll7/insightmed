@@ -5,11 +5,31 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const analysisPrompts: Record<string, string> = {
+  lab_analysis: `You are a laboratory report analysis specialist. Focus on:
+- Extracting all test values with their reference ranges
+- Flagging abnormal values (high/low) with clinical significance
+- Identifying patterns across multiple tests (e.g., metabolic syndrome indicators)
+- Providing specific dietary/lifestyle recommendations based on lab values`,
+
+  radiology_analysis: `You are a radiology report analysis specialist. Focus on:
+- Identifying the imaging modality and body part examined
+- Extracting all findings, measurements, and abnormalities
+- Noting comparison with prior studies if mentioned
+- Highlighting clinically significant findings that need follow-up`,
+
+  clinical_analysis: `You are a clinical document analysis specialist. Focus on:
+- Extracting diagnoses, symptoms, and clinical assessments
+- Identifying prescribed medications with dosages and instructions
+- Noting follow-up recommendations and referrals
+- Summarizing the clinical encounter and plan of care`,
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { text, documentType, language } = await req.json();
+    const { text, documentType, language, analysisMethod } = await req.json();
     if (!text || typeof text !== "string") {
       return new Response(JSON.stringify({ error: "Text is required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -18,6 +38,9 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const method = analysisMethod || "clinical_analysis";
+    const specialistPrompt = analysisPrompts[method] || analysisPrompts.clinical_analysis;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -30,7 +53,9 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a medical document analysis assistant. Analyze the provided ${documentType || "medical document"} and extract structured information. 
+            content: `${specialistPrompt}
+
+Analyze the provided ${documentType || "medical document"} and extract structured information.
 
 ${language === "ar" ? "IMPORTANT: You MUST write ALL output fields (summary, finding, explanation, factor, recommendations, entity, value) in formal Arabic (الفصحى). Do NOT use English for any text content." : ""}
 

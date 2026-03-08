@@ -32,14 +32,33 @@ serve(async (req) => {
           {
             role: "system",
             content: `You are a medical document classifier. Given text from a medical document, classify it into exactly one of these categories:
-- Radiology Report
-- Lab Results
+
+Laboratory Reports:
+- CBC Blood Test (complete blood count, WBC, RBC, hemoglobin, hematocrit, platelets)
+- Blood Glucose Test (fasting glucose, HbA1c, oral glucose tolerance)
+- Lipid Profile (total cholesterol, LDL, HDL, triglycerides)
+- Liver Function Test (ALT, AST, ALP, bilirubin, albumin, GGT)
+- Kidney Function Test (creatinine, BUN, eGFR, uric acid)
+- Thyroid Function Test (TSH, T3, T4, free T4)
+- General Lab Results (any other lab test not fitting above)
+
+Radiology / Imaging:
+- Chest X-Ray
+- CT Scan
+- MRI
+- Ultrasound
+- General Radiology Report (other imaging)
+
+Clinical Documents:
 - Prescription
-- Visit Transcript
+- Medical Visit Report (clinical notes, visit transcript)
 - Discharge Summary
 - Other Medical Document
 
-Also provide a confidence score (0-100).`,
+Also provide:
+- A confidence score (0-100)
+- Detected keywords that helped classification
+- Recommended analysis method (lab_analysis, radiology_analysis, clinical_analysis)`,
           },
           { role: "user", content: `Classify this medical document:\n\n${text.slice(0, 3000)}` },
         ],
@@ -48,25 +67,45 @@ Also provide a confidence score (0-100).`,
             type: "function",
             function: {
               name: "classify_document",
-              description: "Classify a medical document into a category",
+              description: "Classify a medical document into a category with detected keywords",
               parameters: {
                 type: "object",
                 properties: {
                   category: {
                     type: "string",
                     enum: [
-                      "Radiology Report",
-                      "Lab Results",
+                      "CBC Blood Test",
+                      "Blood Glucose Test",
+                      "Lipid Profile",
+                      "Liver Function Test",
+                      "Kidney Function Test",
+                      "Thyroid Function Test",
+                      "General Lab Results",
+                      "Chest X-Ray",
+                      "CT Scan",
+                      "MRI",
+                      "Ultrasound",
+                      "General Radiology Report",
                       "Prescription",
-                      "Visit Transcript",
+                      "Medical Visit Report",
                       "Discharge Summary",
                       "Other Medical Document",
                     ],
                   },
                   confidence: { type: "number", minimum: 0, maximum: 100 },
                   reasoning: { type: "string" },
+                  detected_keywords: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Medical keywords detected in the document that helped classification",
+                  },
+                  analysis_method: {
+                    type: "string",
+                    enum: ["lab_analysis", "radiology_analysis", "clinical_analysis"],
+                    description: "Recommended analysis method based on document type",
+                  },
                 },
-                required: ["category", "confidence", "reasoning"],
+                required: ["category", "confidence", "reasoning", "detected_keywords", "analysis_method"],
                 additionalProperties: false,
               },
             },
