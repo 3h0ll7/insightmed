@@ -75,7 +75,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const [classifiedType, setClassifiedType] = useState<DocumentType | null>(null);
   const [confidence, setConfidence] = useState(0);
   const [reasoning, setReasoning] = useState("");
-  const [showOverride, setShowOverride] = useState(false);
+  const [showOverride, setShowOverride] = useState(true);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
@@ -84,15 +84,13 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
 
   useEffect(() => {
     if (stage === "classified" && confidence > 0) {
+      setShowOverride(true);
       if (confidence < 60) {
-        setShowOverride(true);
         setConfirmed(false);
       } else if (confidence >= 80) {
         setConfirmed(true);
-        setShowOverride(false);
       } else {
         setConfirmed(false);
-        setShowOverride(false);
       }
     }
   }, [stage, confidence]);
