@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Sparkles, Heart, Apple, Activity, Moon, CheckCircle2 } from "lucide-react";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 const defaultInsights = [
   { icon: Heart, titleKey: "cardiovascularHealth", textKey: "cardiovascularText", timeKey: "hoursAgo" },
@@ -15,6 +15,7 @@ interface GuidanceFeedProps {
 }
 
 const GuidanceFeed = ({ recommendations }: GuidanceFeedProps) => {
+  const { t } = useApp();
   const hasLiveData = recommendations && recommendations.length > 0;
 
   return (

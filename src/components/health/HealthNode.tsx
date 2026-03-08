@@ -4,7 +4,7 @@ import {
   FileText, FlaskConical, ScanLine, Brain, Database, ShieldAlert, Sparkles, Clock,
   type LucideIcon, X,
 } from "lucide-react";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 const iconMap: Record<string, LucideIcon> = {
   "Visit Transcript": FileText, "Lab Results": FlaskConical, "Radiology Reports": ScanLine,
@@ -15,6 +15,7 @@ const iconMap: Record<string, LucideIcon> = {
 interface HealthNodeProps { nodeKey: string; label: string; index: number; isActive?: boolean; }
 
 const HealthNode = ({ nodeKey, label, index, isActive = false }: HealthNodeProps) => {
+  const { t } = useApp();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const Icon = iconMap[nodeKey] || Brain;

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
-const defaultLabData = [
+const defaultLabDataAr = [
   { month: "يناير", glucose: 95, cholesterol: 210, hba1c: 5.6 },
   { month: "فبراير", glucose: 102, cholesterol: 205, hba1c: 5.7 },
   { month: "مارس", glucose: 98, cholesterol: 198, hba1c: 5.5 },
@@ -12,6 +12,17 @@ const defaultLabData = [
   { month: "يونيو", glucose: 92, cholesterol: 182, hba1c: 5.4 },
   { month: "يوليو", glucose: 88, cholesterol: 178, hba1c: 5.3 },
   { month: "أغسطس", glucose: 90, cholesterol: 175, hba1c: 5.2 },
+];
+
+const defaultLabDataEn = [
+  { month: "Jan", glucose: 95, cholesterol: 210, hba1c: 5.6 },
+  { month: "Feb", glucose: 102, cholesterol: 205, hba1c: 5.7 },
+  { month: "Mar", glucose: 98, cholesterol: 198, hba1c: 5.5 },
+  { month: "Apr", glucose: 110, cholesterol: 195, hba1c: 5.8 },
+  { month: "May", glucose: 105, cholesterol: 188, hba1c: 5.6 },
+  { month: "Jun", glucose: 92, cholesterol: 182, hba1c: 5.4 },
+  { month: "Jul", glucose: 88, cholesterol: 178, hba1c: 5.3 },
+  { month: "Aug", glucose: 90, cholesterol: 175, hba1c: 5.2 },
 ];
 
 interface ExtractedEntity {
@@ -42,6 +53,11 @@ const parseNumericValue = (val: string): number | null => {
 };
 
 const LabTrendChart = ({ extractedEntities }: LabTrendChartProps) => {
+  const { t, lang } = useApp();
+  const defaultLabData = lang === "ar" ? defaultLabDataAr : defaultLabDataEn;
+  const glucoseLabel = lang === "ar" ? "جلوكوز" : "Glucose";
+  const cholesterolLabel = lang === "ar" ? "كوليسترول" : "Cholesterol";
+
   const entityData = useMemo(() => {
     if (!extractedEntities || extractedEntities.length === 0) return null;
 
@@ -96,9 +112,9 @@ const LabTrendChart = ({ extractedEntities }: LabTrendChartProps) => {
           <YAxis tick={{ fill: "hsl(220 15% 45%)", fontSize: 11 }} axisLine={{ stroke: "hsl(37 15% 85%)" }} />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="glucose" stroke="hsl(38 85% 55%)" strokeWidth={2}
-            dot={{ fill: "hsl(38 85% 55%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(38 85% 55%)" }} name="جلوكوز" />
+            dot={{ fill: "hsl(38 85% 55%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(38 85% 55%)" }} name={glucoseLabel} />
           <Line type="monotone" dataKey="cholesterol" stroke="hsl(170 55% 42%)" strokeWidth={2}
-            dot={{ fill: "hsl(170 55% 42%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(170 55% 42%)" }} name="كوليسترول" />
+            dot={{ fill: "hsl(170 55% 42%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(170 55% 42%)" }} name={cholesterolLabel} />
           <Line type="monotone" dataKey="hba1c" stroke="hsl(220 35% 22%)" strokeWidth={2}
             dot={{ fill: "hsl(220 35% 22%)", r: 3 }} activeDot={{ r: 5, fill: "hsl(220 35% 22%)" }} name="HbA1c" />
         </LineChart>

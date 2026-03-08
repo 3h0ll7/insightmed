@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import AnalysisResults from "./AnalysisResults";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 const DOCUMENT_TYPES = [
   "Radiology Report", "Lab Results", "Prescription", "Visit Transcript", "Discharge Summary", "Other Medical Document",
@@ -17,52 +17,54 @@ const DOCUMENT_TYPES = [
 type DocumentType = (typeof DOCUMENT_TYPES)[number];
 type AnalysisStage = "idle" | "classifying" | "classified" | "extracting" | "structuring" | "risk_mapping" | "generating" | "complete";
 
-const stageLabels: Record<AnalysisStage, string> = {
-  idle: "", classifying: t("stageClassifying"), classified: t("stageClassified"),
-  extracting: t("stageExtracting"), structuring: t("stageStructuring"),
-  risk_mapping: t("stageRiskMapping"), generating: t("stageGenerating"), complete: t("stageComplete"),
-};
-
-const stagePercent: Record<AnalysisStage, number> = {
-  idle: 0, classifying: 10, classified: 20, extracting: 40, structuring: 60, risk_mapping: 80, generating: 90, complete: 100,
-};
-
-const getConfidenceConfig = (score: number) => {
-  if (score >= 80) return {
-    color: "hsl(170 55% 42%)",
-    bgClass: "bg-[hsl(var(--teal-accent)/0.1)]",
-    borderClass: "border-[hsl(var(--teal-accent)/0.3)]",
-    glowClass: "shadow-[0_0_20px_hsl(170_55%_42%/0.3)]",
-    textClass: "text-teal-accent",
-    icon: ShieldCheck,
-    label: t("highConfidence"),
-  };
-  if (score >= 60) return {
-    color: "hsl(38 85% 55%)",
-    bgClass: "bg-[hsl(var(--warm-amber)/0.1)]",
-    borderClass: "border-[hsl(var(--warm-amber)/0.3)]",
-    glowClass: "shadow-[0_0_20px_hsl(38_85%_55%/0.3)]",
-    textClass: "text-warm-amber",
-    icon: ShieldAlert,
-    label: t("mediumConfidence"),
-  };
-  return {
-    color: "hsl(0 72% 51%)",
-    bgClass: "bg-destructive/5",
-    borderClass: "border-destructive/20",
-    glowClass: "shadow-[0_0_20px_hsl(0_72%_51%/0.25)]",
-    textClass: "text-destructive",
-    icon: ShieldQuestion,
-    label: t("lowConfidence"),
-  };
-};
-
 interface SmartInputZoneProps {
   onProcessingChange?: (isProcessing: boolean) => void;
   onAnalysisComplete?: (data: any | null) => void;
 }
 
 const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZoneProps) => {
+  const { t } = useApp();
+
+  const stageLabels: Record<AnalysisStage, string> = {
+    idle: "", classifying: t("stageClassifying"), classified: t("stageClassified"),
+    extracting: t("stageExtracting"), structuring: t("stageStructuring"),
+    risk_mapping: t("stageRiskMapping"), generating: t("stageGenerating"), complete: t("stageComplete"),
+  };
+
+  const stagePercent: Record<AnalysisStage, number> = {
+    idle: 0, classifying: 10, classified: 20, extracting: 40, structuring: 60, risk_mapping: 80, generating: 90, complete: 100,
+  };
+
+  const getConfidenceConfig = (score: number) => {
+    if (score >= 80) return {
+      color: "hsl(170 55% 42%)",
+      bgClass: "bg-[hsl(var(--teal-accent)/0.1)]",
+      borderClass: "border-[hsl(var(--teal-accent)/0.3)]",
+      glowClass: "shadow-[0_0_20px_hsl(170_55%_42%/0.3)]",
+      textClass: "text-teal-accent",
+      icon: ShieldCheck,
+      label: t("highConfidence"),
+    };
+    if (score >= 60) return {
+      color: "hsl(38 85% 55%)",
+      bgClass: "bg-[hsl(var(--warm-amber)/0.1)]",
+      borderClass: "border-[hsl(var(--warm-amber)/0.3)]",
+      glowClass: "shadow-[0_0_20px_hsl(38_85%_55%/0.3)]",
+      textClass: "text-warm-amber",
+      icon: ShieldAlert,
+      label: t("mediumConfidence"),
+    };
+    return {
+      color: "hsl(0 72% 51%)",
+      bgClass: "bg-destructive/5",
+      borderClass: "border-destructive/20",
+      glowClass: "shadow-[0_0_20px_hsl(0_72%_51%/0.25)]",
+      textClass: "text-destructive",
+      icon: ShieldQuestion,
+      label: t("lowConfidence"),
+    };
+  };
+
   const [isDragging, setIsDragging] = useState(false);
   const [text, setText] = useState("");
   const [fileName, setFileName] = useState("");
@@ -75,7 +77,6 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const [error, setError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
-  // Auto-show override for low confidence, auto-confirm for high
   useEffect(() => {
     if (stage === "classified" && confidence > 0) {
       if (confidence < 60) {
@@ -221,7 +222,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                     <Button size="sm" onClick={handleTextSubmit}
                       disabled={text.trim().length < 10 || (stage as AnalysisStage) === "classifying"}
                       className="bg-accent text-accent-foreground hover:bg-accent/90 font-medium">
-                      <Sparkles className="w-3.5 h-3.5 ml-1" /> {t("classify")}
+                      <Sparkles className="w-3.5 h-3.5 ltr:mr-1 rtl:ml-1" /> {t("classify")}
                     </Button>
                   </div>
                 </div>
@@ -251,7 +252,6 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
         <AnimatePresence>
           {(stage === "classified" || isAnalyzing || stage === "complete") && classifiedType && !analysisResult && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 space-y-4">
-              {/* Classification Result Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-teal-accent" />
@@ -264,7 +264,6 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                 </button>
               </div>
 
-              {/* Confidence Score Card */}
               {confidenceConfig && confidence > 0 && (
                 <motion.div
                   className={`p-4 rounded-xl border ${confidenceConfig.bgClass} ${confidenceConfig.borderClass} ${confidenceConfig.glowClass} transition-shadow`}
@@ -287,7 +286,6 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                     </motion.span>
                   </div>
 
-                  {/* Glowing Progress Bar */}
                   <div className="h-2.5 bg-secondary/80 rounded-full overflow-hidden relative">
                     <motion.div
                       className="h-full rounded-full relative"
@@ -305,31 +303,27 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                     </motion.div>
                   </div>
 
-                  {/* Status Message */}
                   <p className={`text-xs mt-2.5 ${confidenceConfig.textClass} font-medium`}>
                     {confidenceConfig.label}
                   </p>
 
-                  {/* Reasoning */}
                   {reasoning && (
                     <p className="text-xs text-muted-foreground mt-1.5">
                       <span className="font-medium text-foreground/70">{t("reasoning")}</span> {reasoning}
                     </p>
                   )}
 
-                  {/* Confirm button for medium confidence */}
                   {confidence >= 60 && confidence < 80 && !confirmed && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-3">
                       <Button size="sm" onClick={() => setConfirmed(true)}
                         className="bg-accent/15 text-accent border border-accent/30 hover:bg-accent/25 text-xs font-medium">
-                        <CheckCircle2 className="w-3.5 h-3.5 ml-1" /> {t("confirmClassification")}
+                        <CheckCircle2 className="w-3.5 h-3.5 ltr:mr-1 rtl:ml-1" /> {t("confirmClassification")}
                       </Button>
                     </motion.div>
                   )}
                 </motion.div>
               )}
 
-              {/* Override Document Types */}
               <AnimatePresence>
                 {showOverride && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="flex flex-wrap gap-2">
@@ -362,7 +356,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                 <div className="flex gap-3">
                   <Button onClick={startAnalysis} disabled={!canStartAnalysis}
                     className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm py-3 h-auto disabled:opacity-50">
-                    <Sparkles className="w-4 h-4 ml-2" /> {t("startAnalysis")}
+                    <Sparkles className="w-4 h-4 ltr:mr-2 rtl:ml-2" /> {t("startAnalysis")}
                   </Button>
                   <Button variant="outline" onClick={reset} className="border-border text-muted-foreground hover:text-foreground">{t("clear")}</Button>
                 </div>
