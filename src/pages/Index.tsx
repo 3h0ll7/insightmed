@@ -1,12 +1,11 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import NeuralBackground from "@/components/health/NeuralBackground";
 import SmartInputZone from "@/components/health/SmartInputZone";
 import HealthFlowDiagram from "@/components/health/HealthFlowDiagram";
 import LabTrendChart from "@/components/health/LabTrendChart";
 import RiskMeter from "@/components/health/RiskMeter";
 import GuidanceFeed from "@/components/health/GuidanceFeed";
-import { Brain } from "lucide-react";
+import { Heart } from "lucide-react";
 
 const Index = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -16,37 +15,34 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen relative neural-gradient">
-      <NeuralBackground />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div className="min-h-screen editorial-gradient">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
         {/* Header */}
         <motion.div
-          className="flex items-center gap-3 mb-8"
+          className="mb-12 text-center"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="w-10 h-10 rounded-xl bg-[hsl(var(--glow-cyan)/0.1)] flex items-center justify-center border border-[hsl(var(--glow-cyan)/0.2)]">
-            <Brain className="w-5 h-5 text-glow-cyan" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium mb-6">
+            <Heart className="w-3.5 h-3.5" />
+            Trusted by Healthcare Professionals
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground glow-text">
-              Health Intelligence
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              AI-powered health data analysis pipeline
-            </p>
-          </div>
+          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-foreground leading-tight mb-4">
+            AI-Powered Health<br />Intelligence Platform
+          </h1>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-sans">
+            Upload your medical documents and get structured, evidence-based analysis powered by advanced AI.
+          </p>
         </motion.div>
 
         {/* Smart Input */}
-        <div className="mb-6">
+        <div className="mb-10 max-w-3xl mx-auto">
           <SmartInputZone onProcessingChange={handleProcessingChange} />
         </div>
 
         {/* Flow Diagram */}
-        <div className="mb-6">
+        <div className="mb-10">
           <HealthFlowDiagram isProcessing={isProcessing} />
         </div>
 

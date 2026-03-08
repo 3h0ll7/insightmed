@@ -57,10 +57,16 @@ export default {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			},
-  			glow: {
-  				cyan: 'hsl(var(--glow-cyan))',
-  				teal: 'hsl(var(--glow-teal))'
-  			}
+  			warm: {
+  				gold: 'hsl(var(--warm-gold))',
+  				amber: 'hsl(var(--warm-amber))',
+  			},
+  			teal: {
+  				accent: 'hsl(var(--teal-accent))',
+  			},
+  			soft: {
+  				green: 'hsl(var(--soft-green))',
+  			},
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
@@ -69,87 +75,27 @@ export default {
   		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
   			},
-  			'pulse-glow': {
-  				'0%, 100%': {
-  					opacity: '0.4'
-  				},
-  				'50%': {
-  					opacity: '1'
-  				}
+  			'fade-in-up': {
+  				'0%': { opacity: '0', transform: 'translateY(16px)' },
+  				'100%': { opacity: '1', transform: 'translateY(0)' }
   			},
-  			'flow-line': {
-  				'0%': {
-  					strokeDashoffset: '20'
-  				},
-  				'100%': {
-  					strokeDashoffset: '0'
-  				}
-  			},
-  			'float': {
-  				'0%, 100%': {
-  					transform: 'translateY(0px)'
-  				},
-  				'50%': {
-  					transform: 'translateY(-6px)'
-  				}
-  			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
-  			'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
-  			'flow-line': 'flow-line 1s linear infinite',
-  			'float': 'float 4s ease-in-out infinite'
+  			'fade-in-up': 'fade-in-up 0.5s ease-out',
   		},
   		fontFamily: {
-  			sans: [
-  				'Space Grotesk',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'-apple-system',
-  				'BlinkMacSystemFont',
-  				'Segoe UI',
-  				'Roboto',
-  				'Helvetica Neue',
-  				'Arial',
-  				'Noto Sans',
-  				'sans-serif'
-  			],
-  			serif: [
-  				'Lora',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
-  			],
-  			mono: [
-  				'Space Mono',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'Menlo',
-  				'Monaco',
-  				'Consolas',
-  				'Liberation Mono',
-  				'Courier New',
-  				'monospace'
-  			]
+  			sans: ['DM Sans', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+  			serif: ['Playfair Display', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+  			mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
   		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',
