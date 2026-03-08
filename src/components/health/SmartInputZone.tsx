@@ -170,6 +170,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const reset = () => {
     setText(""); setFileName(""); setStage("idle"); setClassifiedType(null);
     setAnalysisResult(null); setError(""); setShowOverride(false); setConfirmed(false); setReasoning("");
+    setAnalysisMethod("clinical_analysis"); setDetectedKeywords([]);
     onAnalysisComplete?.(null);
   };
   const isAnalyzing = ["extracting", "structuring", "risk_mapping", "generating"].includes(stage);
