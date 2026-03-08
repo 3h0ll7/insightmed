@@ -4,6 +4,7 @@ import {
   FileText, FlaskConical, ScanLine, Brain, Database, ShieldAlert, Sparkles, Clock,
   type LucideIcon, X,
 } from "lucide-react";
+import { t } from "@/i18n/useTranslation";
 
 const iconMap: Record<string, LucideIcon> = {
   "Visit Transcript": FileText, "Lab Results": FlaskConical, "Radiology Reports": ScanLine,
@@ -11,24 +12,14 @@ const iconMap: Record<string, LucideIcon> = {
   "Personalized Guidance Engine": Sparkles, "Health Timeline": Clock,
 };
 
-const descriptions: Record<string, { short: string; detail: string }> = {
-  "Visit Transcript": { short: "Clinical notes from doctor visits", detail: "Raw transcripts from patient-provider conversations are parsed using NLP to extract diagnoses, prescriptions, follow-ups, and patient concerns." },
-  "Lab Results": { short: "Blood work and lab panel data", detail: "CBC, metabolic panels, lipid profiles, A1C, and specialized tests are ingested and normalized into structured data with reference ranges." },
-  "Radiology Reports": { short: "Imaging and scan findings", detail: "X-ray, MRI, CT, and ultrasound reports are analyzed for key findings, measurements, and follow-up recommendations." },
-  "AI Extraction Engine": { short: "Intelligent data parsing pipeline", detail: "Multi-modal AI models process unstructured medical documents, extracting entities, relationships, and temporal patterns." },
-  "Structured Health Data": { short: "Normalized patient health records", detail: "All extracted data is mapped to standardized medical ontologies (SNOMED, ICD-10, LOINC) for interoperability." },
-  "Risk Analysis Module": { short: "Predictive health risk scoring", detail: "Machine learning models analyze longitudinal data to calculate risk scores for cardiovascular, metabolic, and other health domains." },
-  "Personalized Guidance Engine": { short: "AI-powered health recommendations", detail: "Context-aware algorithms generate personalized lifestyle, dietary, and preventive care recommendations." },
-  "Health Timeline": { short: "Longitudinal health journey map", detail: "An interactive chronological view of all health events, trends, and milestones." },
-};
+interface HealthNodeProps { nodeKey: string; label: string; index: number; isActive?: boolean; }
 
-interface HealthNodeProps { label: string; index: number; isActive?: boolean; }
-
-const HealthNode = ({ label, index, isActive = false }: HealthNodeProps) => {
+const HealthNode = ({ nodeKey, label, index, isActive = false }: HealthNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const Icon = iconMap[label] || Brain;
-  const info = descriptions[label];
+  const Icon = iconMap[nodeKey] || Brain;
+  const shortDesc = t(`${nodeKey}_short`);
+  const detailDesc = t(`${nodeKey}_detail`);
 
   return (
     <>
@@ -60,7 +51,7 @@ const HealthNode = ({ label, index, isActive = false }: HealthNodeProps) => {
           {isHovered && (
             <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }}
               className="absolute -bottom-10 warm-card px-3 py-1.5 text-xs text-muted-foreground whitespace-nowrap z-20 shadow-sm">
-              {info?.short}
+              {shortDesc}
             </motion.div>
           )}
         </AnimatePresence>
@@ -73,7 +64,7 @@ const HealthNode = ({ label, index, isActive = false }: HealthNodeProps) => {
             <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" onClick={() => setIsExpanded(false)} />
             <motion.div className="warm-card p-6 sm:p-8 max-w-md w-full relative z-10 shadow-xl"
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
-              <button onClick={() => setIsExpanded(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+              <button onClick={() => setIsExpanded(false)} className="absolute top-4 left-4 text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-4 mb-4">
@@ -82,7 +73,7 @@ const HealthNode = ({ label, index, isActive = false }: HealthNodeProps) => {
                 </div>
                 <h3 className="text-lg font-serif font-semibold text-foreground">{label}</h3>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{info?.detail}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{detailDesc}</p>
             </motion.div>
           </motion.div>
         )}
