@@ -84,15 +84,13 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
 
   useEffect(() => {
     if (stage === "classified" && confidence > 0) {
+      setShowOverride(true);
       if (confidence < 60) {
-        setShowOverride(true);
         setConfirmed(false);
       } else if (confidence >= 80) {
         setConfirmed(true);
-        setShowOverride(false);
       } else {
         setConfirmed(false);
-        setShowOverride(false);
       }
     }
   }, [stage, confidence]);
