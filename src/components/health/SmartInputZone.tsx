@@ -11,7 +11,10 @@ import AnalysisResults from "./AnalysisResults";
 import { useApp } from "@/i18n/LanguageContext";
 
 const DOCUMENT_TYPES = [
-  "Radiology Report", "Lab Results", "Prescription", "Visit Transcript", "Discharge Summary", "Other Medical Document",
+  "CBC Blood Test", "Blood Glucose Test", "Lipid Profile", "Liver Function Test",
+  "Kidney Function Test", "Thyroid Function Test", "General Lab Results",
+  "Chest X-Ray", "CT Scan", "MRI", "Ultrasound", "General Radiology Report",
+  "Prescription", "Medical Visit Report", "Discharge Summary", "Other Medical Document",
 ] as const;
 
 type DocumentType = (typeof DOCUMENT_TYPES)[number];
@@ -76,6 +79,8 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [analysisMethod, setAnalysisMethod] = useState("clinical_analysis");
+  const [detectedKeywords, setDetectedKeywords] = useState<string[]>([]);
 
   useEffect(() => {
     if (stage === "classified" && confidence > 0) {
@@ -132,6 +137,8 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
       setClassifiedType(data.category as DocumentType);
       setConfidence(data.confidence || 0);
       setReasoning(data.reasoning || "");
+      setAnalysisMethod(data.analysis_method || "clinical_analysis");
+      setDetectedKeywords(data.detected_keywords || []);
       setStage("classified"); onProcessingChange?.(false);
     } catch (err: any) {
       setStage("classified"); setClassifiedType("Other Medical Document"); setConfidence(0); onProcessingChange?.(false);
@@ -146,7 +153,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
     let stageIdx = 0; setStage(stages[0]);
     const interval = setInterval(() => { stageIdx++; if (stageIdx < stages.length) setStage(stages[stageIdx]); }, 2000);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document", language: lang } });
+      const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document", language: lang, analysisMethod } });
       clearInterval(interval);
       if (fnError) throw new Error(fnError.message);
       if (data?.error) throw new Error(data.error);
@@ -163,6 +170,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const reset = () => {
     setText(""); setFileName(""); setStage("idle"); setClassifiedType(null);
     setAnalysisResult(null); setError(""); setShowOverride(false); setConfirmed(false); setReasoning("");
+    setAnalysisMethod("clinical_analysis"); setDetectedKeywords([]);
     onAnalysisComplete?.(null);
   };
   const isAnalyzing = ["extracting", "structuring", "risk_mapping", "generating"].includes(stage);
@@ -311,6 +319,15 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                     <p className="text-xs text-muted-foreground mt-1.5">
                       <span className="font-medium text-foreground/70">{t("reasoning")}</span> {reasoning}
                     </p>
+                  )}
+
+                  {detectedKeywords.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="text-xs font-medium text-foreground/70">{t("detectedKeywords")}</span>
+                      {detectedKeywords.map((kw, i) => (
+                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground">{kw}</span>
+                      ))}
+                    </div>
                   )}
 
                   {confidence >= 60 && confidence < 80 && !confirmed && (
