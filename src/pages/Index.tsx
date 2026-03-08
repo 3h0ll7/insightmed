@@ -70,6 +70,7 @@ const Index = () => {
             <Heart className="w-3.5 h-3.5" />
             {t("trustedBy")}
           </div>
+          <p className="text-sm font-medium text-accent mb-2 tracking-wide">{t("appName")}</p>
           <h1 className="text-3xl sm:text-5xl font-serif font-bold text-foreground leading-tight mb-4">
             {t("heroTitle1")}<br />{t("heroTitle2")}
           </h1>

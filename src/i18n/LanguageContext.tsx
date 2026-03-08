@@ -42,6 +42,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
+    document.title = lang === "ar" ? "بصيرة الصحة | تحليل طبي بالذكاء الاصطناعي" : "InsightMed | AI-Powered Medical Analysis";
     if (lang === "ar") {
       document.body.style.fontFamily = "'Noto Sans Arabic', 'DM Sans', system-ui, sans-serif";
     } else {

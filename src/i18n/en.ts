@@ -1,5 +1,6 @@
 const en = {
   // Index page
+  appName: "InsightMed",
   trustedBy: "Trusted by Healthcare Professionals",
   heroTitle1: "Health Intelligence",
   heroTitle2: "Powered by AI",
