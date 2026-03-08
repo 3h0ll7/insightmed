@@ -79,6 +79,8 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [analysisMethod, setAnalysisMethod] = useState("clinical_analysis");
+  const [detectedKeywords, setDetectedKeywords] = useState<string[]>([]);
 
   useEffect(() => {
     if (stage === "classified" && confidence > 0) {
