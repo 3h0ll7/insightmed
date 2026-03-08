@@ -23,7 +23,7 @@ interface SmartInputZoneProps {
 }
 
 const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZoneProps) => {
-  const { t } = useApp();
+  const { t, lang } = useApp();
 
   const stageLabels: Record<AnalysisStage, string> = {
     idle: "", classifying: t("stageClassifying"), classified: t("stageClassified"),
