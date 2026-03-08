@@ -28,8 +28,10 @@ const entityIcons: Record<string, typeof Pill> = {
 
 const exportToPdf = async (result: AnalysisResult, documentType: string) => {
   try {
-    const { default: jsPDF } = await import("jspdf");
-    await import("jspdf-autotable");
+    const jsPDFModule = await import("jspdf");
+    const jsPDF = jsPDFModule.default;
+    const autoTableModule = await import("jspdf-autotable");
+    const autoTable = autoTableModule.default;
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
