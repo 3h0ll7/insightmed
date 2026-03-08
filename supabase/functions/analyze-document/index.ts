@@ -32,6 +32,8 @@ serve(async (req) => {
             role: "system",
             content: `You are a medical document analysis assistant. Analyze the provided ${documentType || "medical document"} and extract structured information. 
 
+${language === "ar" ? "IMPORTANT: You MUST write ALL output fields (summary, finding, explanation, factor, recommendations, entity, value) in formal Arabic (الفصحى). Do NOT use English for any text content." : ""}
+
 IMPORTANT: Include a disclaimer that this is for informational purposes only and not a medical diagnosis. Always recommend consulting a healthcare professional.`,
           },
           { role: "user", content: `Analyze this ${documentType || "medical document"}:\n\n${text.slice(0, 5000)}` },
