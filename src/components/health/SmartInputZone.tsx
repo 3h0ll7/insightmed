@@ -153,7 +153,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
     let stageIdx = 0; setStage(stages[0]);
     const interval = setInterval(() => { stageIdx++; if (stageIdx < stages.length) setStage(stages[stageIdx]); }, 2000);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document", language: lang } });
+      const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document", language: lang, analysisMethod } });
       clearInterval(interval);
       if (fnError) throw new Error(fnError.message);
       if (data?.error) throw new Error(data.error);
