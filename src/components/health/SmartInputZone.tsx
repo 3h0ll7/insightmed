@@ -135,6 +135,8 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
       setClassifiedType(data.category as DocumentType);
       setConfidence(data.confidence || 0);
       setReasoning(data.reasoning || "");
+      setAnalysisMethod(data.analysis_method || "clinical_analysis");
+      setDetectedKeywords(data.detected_keywords || []);
       setStage("classified"); onProcessingChange?.(false);
     } catch (err: any) {
       setStage("classified"); setClassifiedType("Other Medical Document"); setConfidence(0); onProcessingChange?.(false);
