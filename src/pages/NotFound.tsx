@@ -1,8 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 const NotFound = () => {
+  const { t } = useApp();
   const location = useLocation();
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle2, Info, Shield, Pill, Stethoscope, Activity,
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 interface KeyFinding { finding: string; significance: "normal" | "attention" | "critical"; explanation: string; }
 interface RiskFactor { factor: string; level: "low" | "moderate" | "high"; }
@@ -27,14 +27,7 @@ const entityIcons: Record<string, typeof Pill> = {
   condition: Activity, medication: Pill, procedure: Stethoscope, measurement: Activity, anatomy: Stethoscope,
 };
 
-const getRiskLevelAr = (level: string) => {
-  if (level === "low") return t("low");
-  if (level === "moderate") return t("moderate");
-  if (level === "high") return t("high");
-  return level;
-};
-
-const exportToPdf = async (result: AnalysisResult, documentType: string) => {
+const exportToPdf = async (result: AnalysisResult, documentType: string, t: (key: string) => string) => {
   try {
     const jsPDFModule = await import("jspdf");
     const jsPDF = jsPDFModule.default;
@@ -55,7 +48,7 @@ const exportToPdf = async (result: AnalysisResult, documentType: string) => {
     doc.text("Health Intelligence Report", margin, 18);
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Document Type: ${documentType}  |  Generated: ${new Date().toLocaleDateString("ar-SA")}`, margin, 30);
+    doc.text(`Document Type: ${documentType}  |  Generated: ${new Date().toLocaleDateString()}`, margin, 30);
     y = 50;
 
     doc.setTextColor(43, 57, 73);
@@ -179,6 +172,15 @@ const exportToPdf = async (result: AnalysisResult, documentType: string) => {
 };
 
 const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps) => {
+  const { t } = useApp();
+
+  const getRiskLevelLabel = (level: string) => {
+    if (level === "low") return t("low");
+    if (level === "moderate") return t("moderate");
+    if (level === "high") return t("high");
+    return level;
+  };
+
   return (
     <motion.div className="space-y-5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <div className="warm-card p-6">
@@ -189,7 +191,7 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
             <Badge className="bg-accent/15 text-accent border-accent/25 text-xs">{documentType}</Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => exportToPdf(result, documentType)}
+            <Button variant="outline" size="sm" onClick={() => exportToPdf(result, documentType, t)}
               className="gap-1.5 text-accent border-accent/25 hover:bg-accent/10">
               <Download className="w-3.5 h-3.5" /> {t("exportPdf")}
             </Button>
@@ -237,7 +239,7 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
                 <motion.div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/60"
                   initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
                   <span className="text-sm text-foreground">{r.factor}</span>
-                  <span className={`text-xs px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.color} font-medium`}>{getRiskLevelAr(r.level)}</span>
+                  <span className={`text-xs px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.color} font-medium`}>{getRiskLevelLabel(r.level)}</span>
                 </motion.div>
               );
             })}

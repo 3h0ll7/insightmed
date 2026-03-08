@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import HealthNode from "./HealthNode";
 import FlowConnections from "./FlowConnections";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 const nodeKeys = [
   "Visit Transcript", "Lab Results", "Radiology Reports", "AI Extraction Engine",
@@ -12,6 +12,7 @@ const nodeKeys = [
 interface HealthFlowDiagramProps { isProcessing?: boolean; }
 
 const HealthFlowDiagram = ({ isProcessing = false }: HealthFlowDiagramProps) => {
+  const { t } = useApp();
   const [activeNodeIndex, setActiveNodeIndex] = useState(-1);
 
   useEffect(() => {

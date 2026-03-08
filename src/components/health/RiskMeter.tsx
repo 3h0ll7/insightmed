@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 interface RiskMeterProps {
   value?: number;
@@ -8,6 +8,7 @@ interface RiskMeterProps {
 }
 
 const RiskMeter = ({ value = 32, label, animated = false }: RiskMeterProps) => {
+  const { t } = useApp();
   const displayLabel = label || t("overallRisk");
   const circumference = 2 * Math.PI * 54;
   const offset = circumference - (value / 100) * circumference * 0.75;

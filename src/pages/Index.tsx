@@ -6,7 +6,7 @@ import LabTrendChart from "@/components/health/LabTrendChart";
 import RiskMeter from "@/components/health/RiskMeter";
 import GuidanceFeed from "@/components/health/GuidanceFeed";
 import { Heart } from "lucide-react";
-import { t } from "@/i18n/useTranslation";
+import { useApp } from "@/i18n/LanguageContext";
 
 export interface AnalysisData {
   summary: string;
@@ -17,6 +17,7 @@ export interface AnalysisData {
 }
 
 const Index = () => {
+  const { t } = useApp();
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
 
