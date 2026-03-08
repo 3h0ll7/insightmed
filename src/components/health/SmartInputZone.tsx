@@ -328,7 +328,6 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                         <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground">{kw}</span>
                       ))}
                     </div>
-                  )
                   )}
 
                   {confidence >= 60 && confidence < 80 && !confirmed && (
