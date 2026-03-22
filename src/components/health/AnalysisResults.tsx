@@ -202,6 +202,31 @@ const AnalysisResults = ({ result, documentType, onReset }: AnalysisResultsProps
           </div>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">{result.summary}</p>
+        {result.council && (
+          <motion.div className="mt-4 p-3 rounded-lg bg-accent/5 border border-accent/15" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm">👔</span>
+              <span className="text-xs font-semibold text-accent">{t("councilVerdict")}</span>
+              <span className="text-[10px] text-muted-foreground">
+                {result.council.successful_models}/{result.council.total_models} {t("modelsContributed")}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {result.council.models.map((m, i) => (
+                <span key={i} className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                  m.status === "success"
+                    ? "border-[hsl(var(--teal-accent)/0.3)] bg-[hsl(var(--teal-accent)/0.08)] text-teal-accent"
+                    : "border-destructive/20 bg-destructive/5 text-destructive"
+                }`}>
+                  {m.status === "success" ? "✓" : "✗"} {m.name}
+                </span>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1.5">
+              {t("synthesizedBy")}: {result.council.synthesized_by}
+            </p>
+          </motion.div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
