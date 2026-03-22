@@ -8,7 +8,8 @@ import { useApp } from "@/i18n/LanguageContext";
 interface KeyFinding { finding: string; significance: "normal" | "attention" | "critical"; explanation: string; }
 interface RiskFactor { factor: string; level: "low" | "moderate" | "high"; }
 interface MedicalEntity { entity: string; type: "condition" | "medication" | "procedure" | "measurement" | "anatomy"; value?: string; }
-interface AnalysisResult { summary: string; key_findings: KeyFinding[]; risk_factors: RiskFactor[]; recommendations: string[]; medical_entities: MedicalEntity[]; }
+interface CouncilInfo { models: { name: string; status: string }[]; synthesized_by: string; total_models: number; successful_models: number; }
+interface AnalysisResult { summary: string; key_findings: KeyFinding[]; risk_factors: RiskFactor[]; recommendations: string[]; medical_entities: MedicalEntity[]; council?: CouncilInfo; }
 interface AnalysisResultsProps { result: AnalysisResult; documentType: string; onReset: () => void; }
 
 const significanceConfig = {
