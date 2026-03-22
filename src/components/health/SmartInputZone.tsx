@@ -147,9 +147,9 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
   const startAnalysis = async () => {
     if (!text.trim()) return;
     setError(""); setAnalysisResult(null); onProcessingChange?.(true);
-    const stages: AnalysisStage[] = ["extracting", "structuring", "risk_mapping", "generating"];
+    const stages: AnalysisStage[] = ["model1", "model2", "model3", "synthesizing"];
     let stageIdx = 0; setStage(stages[0]);
-    const interval = setInterval(() => { stageIdx++; if (stageIdx < stages.length) setStage(stages[stageIdx]); }, 2000);
+    const interval = setInterval(() => { stageIdx++; if (stageIdx < stages.length) setStage(stages[stageIdx]); }, 3000);
     try {
       const { data, error: fnError } = await supabase.functions.invoke("analyze-document", { body: { text: text.slice(0, 5000), documentType: classifiedType || "Medical Document", language: lang, analysisMethod } });
       clearInterval(interval);
