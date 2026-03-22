@@ -355,7 +355,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
               {fileName && <p className="text-xs text-muted-foreground flex items-center gap-1.5"><FileText className="w-3 h-3" /> {fileName}</p>}
 
               {isAnalyzing && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-accent font-medium animate-pulse">{stageLabels[stage]}</span>
                     <span className="text-xs text-muted-foreground">{stagePercent[stage]}%</span>
@@ -364,6 +364,41 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
                     <motion.div className="h-full rounded-full bg-accent"
                       initial={{ width: "0%" }} animate={{ width: `${stagePercent[stage]}%` }} transition={{ duration: 0.6, ease: "easeOut" }} />
                   </div>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {[
+                      { key: "model1" as const, name: "Gemini Pro", icon: "🧠" },
+                      { key: "model2" as const, name: "Gemini Flash", icon: "⚡" },
+                      { key: "model3" as const, name: "GPT-5 Mini", icon: "🤖" },
+                    ].map((m) => {
+                      const isActive = stage === m.key;
+                      const isDone = stagePercent[stage] > stagePercent[m.key];
+                      return (
+                        <motion.div key={m.key}
+                          className={`text-center p-2 rounded-lg border text-xs transition-colors ${
+                            isActive ? "border-accent/40 bg-accent/10 text-accent" :
+                            isDone ? "border-[hsl(var(--teal-accent)/0.3)] bg-[hsl(var(--teal-accent)/0.08)] text-teal-accent" :
+                            "border-border bg-secondary/50 text-muted-foreground"
+                          }`}
+                          animate={isActive ? { scale: [1, 1.02, 1] } : {}}
+                          transition={isActive ? { repeat: Infinity, duration: 1.5 } : {}}
+                        >
+                          <span className="text-base">{m.icon}</span>
+                          <p className="font-medium mt-0.5">{m.name}</p>
+                          <p className="text-[10px] mt-0.5 opacity-70">
+                            {isDone ? "✓" : isActive ? t("analyzing") : t("waiting")}
+                          </p>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                  {stage === "synthesizing" && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="text-center p-3 rounded-lg border border-accent/30 bg-accent/5">
+                      <span className="text-base">👔</span>
+                      <p className="text-xs font-semibold text-accent mt-1">{t("ceoSynthesizing")}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{t("ceoDescription")}</p>
+                    </motion.div>
+                  )}
                 </div>
               )}
 
