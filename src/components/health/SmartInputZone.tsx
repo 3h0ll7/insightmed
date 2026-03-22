@@ -171,7 +171,7 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
     setAnalysisMethod("clinical_analysis"); setDetectedKeywords([]);
     onAnalysisComplete?.(null);
   };
-  const isAnalyzing = ["extracting", "structuring", "risk_mapping", "generating"].includes(stage);
+  const isAnalyzing = ["model1", "model2", "model3", "synthesizing"].includes(stage);
   const getDocTypeLabel = (type: string) => t(type) || type;
   const canStartAnalysis = stage === "classified" && (confirmed || confidence >= 80);
 
