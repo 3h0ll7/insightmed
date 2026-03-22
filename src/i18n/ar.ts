@@ -39,11 +39,20 @@ const ar = {
   // Stage labels
   stageClassifying: "جاري تصنيف المستند…",
   stageClassified: "تم تصنيف المستند",
-  stageExtracting: "جاري استخراج الكيانات الطبية…",
-  stageStructuring: "جاري هيكلة البيانات…",
-  stageRiskMapping: "جاري تعيين عوامل الخطر…",
-  stageGenerating: "جاري إنشاء التوجيهات…",
+  stageModel1: "Gemini Pro يحلل المستند…",
+  stageModel2: "Gemini Flash يحلل المستند…",
+  stageModel3: "GPT-5 Mini يحلل المستند…",
+  stageSynthesizing: "كبير مسؤولي الذكاء الاصطناعي يجمع النتائج…",
   stageComplete: "اكتمل التحليل",
+
+  // Multi-model
+  analyzing: "يحلل…",
+  waiting: "ينتظر…",
+  ceoSynthesizing: "كبير مسؤولي الذكاء الاصطناعي — التوليف النهائي",
+  ceoDescription: "GPT-5 يراجع نتائج جميع النماذج لتقديم أفضل نتيجة",
+  councilVerdict: "حكم مجلس الذكاء الاصطناعي",
+  modelsContributed: "نماذج ساهمت",
+  synthesizedBy: "تم التوليف بواسطة",
 
   // AnalysisResults
   analysisComplete: "اكتمل التحليل",

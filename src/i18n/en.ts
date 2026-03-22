@@ -39,11 +39,20 @@ const en = {
   // Stage labels
   stageClassifying: "Classifying document…",
   stageClassified: "Document classified",
-  stageExtracting: "Extracting medical entities…",
-  stageStructuring: "Structuring data…",
-  stageRiskMapping: "Mapping risk factors…",
-  stageGenerating: "Generating guidance…",
+  stageModel1: "Gemini Pro is analyzing…",
+  stageModel2: "Gemini Flash is analyzing…",
+  stageModel3: "GPT-5 Mini is analyzing…",
+  stageSynthesizing: "Chief AI Officer is synthesizing results…",
   stageComplete: "Analysis complete",
+
+  // Multi-model
+  analyzing: "Analyzing…",
+  waiting: "Waiting…",
+  ceoSynthesizing: "Chief AI Officer — Final Synthesis",
+  ceoDescription: "GPT-5 reviews all models' findings to deliver the best result",
+  councilVerdict: "AI Council Verdict",
+  modelsContributed: "models contributed",
+  synthesizedBy: "Synthesized by",
 
   // AnalysisResults
   analysisComplete: "Analysis Complete",
