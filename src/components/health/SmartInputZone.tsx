@@ -18,7 +18,7 @@ const DOCUMENT_TYPES = [
 ] as const;
 
 type DocumentType = (typeof DOCUMENT_TYPES)[number];
-type AnalysisStage = "idle" | "classifying" | "classified" | "extracting" | "structuring" | "risk_mapping" | "generating" | "complete";
+type AnalysisStage = "idle" | "classifying" | "classified" | "model1" | "model2" | "model3" | "synthesizing" | "complete";
 
 interface SmartInputZoneProps {
   onProcessingChange?: (isProcessing: boolean) => void;
