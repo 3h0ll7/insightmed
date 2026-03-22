@@ -30,12 +30,12 @@ const SmartInputZone = ({ onProcessingChange, onAnalysisComplete }: SmartInputZo
 
   const stageLabels: Record<AnalysisStage, string> = {
     idle: "", classifying: t("stageClassifying"), classified: t("stageClassified"),
-    extracting: t("stageExtracting"), structuring: t("stageStructuring"),
-    risk_mapping: t("stageRiskMapping"), generating: t("stageGenerating"), complete: t("stageComplete"),
+    model1: t("stageModel1"), model2: t("stageModel2"), model3: t("stageModel3"),
+    synthesizing: t("stageSynthesizing"), complete: t("stageComplete"),
   };
 
   const stagePercent: Record<AnalysisStage, number> = {
-    idle: 0, classifying: 10, classified: 20, extracting: 40, structuring: 60, risk_mapping: 80, generating: 90, complete: 100,
+    idle: 0, classifying: 10, classified: 20, model1: 35, model2: 55, model3: 75, synthesizing: 90, complete: 100,
   };
 
   const getConfidenceConfig = (score: number) => {
